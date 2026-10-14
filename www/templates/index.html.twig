@@ -1,0 +1,22 @@
+{% extends "base.html.twig" %}
+
+{% block title %}Index{% endblock %}
+{% block content %}
+<h1>Liste des manuscrits de la bibliothèque du Patrimoine de Clermont Auvergne Métropole</h1>
+<table>
+    <tr>
+        <th>Référence</th>
+        <th>Titre</th>
+        <th>Auteur</th>
+        <th>Actions</th>
+    </tr>
+    {% for document in list %}
+    <tr>
+        <td>{{ document.name }}</td>
+        <td>{{ document.name }}</td>
+        <td>{{ document.name }}</td>
+        <td><a href="get.php?id=1">voir</a>&nbsp;/&nbsp;<a href="edit.php?id=1">éditer</a>&nbsp;/&nbsp;<a href="delete.php?id=1">supprimer</a></td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}

@@ -1,0 +1,130 @@
+version: "3.3"
+services:
+    tpmongo-mongodb:
+        container_name: "tpmongo-mongodb"
+        image: mongo:latest
+        ports:
+            - "27017:27017"
+        environment:
+            - MONGO_INITDB_ROOT_USERNAME=zz3f3
+            - MONGO_INITDB_ROOT_PASSWORD=easyma
+#            - MONGO_INITDB_DATABASE=auth
+        networks:
+            - local
+    tpmongo-mongo-gui:
+        container_name: "tpmongo-mongo-gui"
+        image: ugleiton/mongo-gui
+        ports:
+            - "4321:4321"
+        depends_on:
+            -   tpmongo-mongodb
+        environment:
+            - MONGO_URL=mongodb://zz3f3:easyma@tpmongo-mongodb
+        networks:
+            - local
+    tpmongo-php:
+        container_name: "tpmongo-php"
+        image: citizen63000/ubuntu-php-mongo:1.4
+        depends_on:
+            -   tpmongo-mongodb
+        ports:
+           - 8080:80
+        volumes:
+           - ./www:/var/www/app/
+        networks:
+            - local
+    tpmongo-redis:
+        container_name: "tpmongo-redis"
+        image: redis:7.0.5
+        ports:
+            - 6379:6379
+        networks:
+            - local
+    tpmongo-redis-commander:
+        container_name: "tpmongo-redis-commander"
+        image: rediscommander/redis-commander:latest
+        depends_on:
+            -   tpmongo-redis
+        ports:
+            - 8081:8081
+        environment:
+            - REDIS_HOSTS=local:tpmongo-redis:6379
+        networks:
+            - local
+    tpmongo-influxdb:
+        container_name: "tpmongo-influxdb"
+        image: influxdb:1.8
+        ports:
+            - "8086:8086"
+        environment:
+            - INFLUXDB_DB=k6
+        networks:
+            - local
+    tpmongo-grafana:
+        container_name: "tpmongo-grafana"
+        image: grafana/grafana:latest
+        depends_on:
+            -   tpmongo-influxdb
+        ports:
+            - "3000:3000"
+        environment:
+            - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+            - GF_AUTH_ANONYMOUS_ENABLED=true
+            - GF_AUTH_BASIC_ENABLED=false
+        volumes:
+            - ./grafana/dashboards:/var/lib/grafana/dashboards
+            - ./grafana/dashboard.yaml:/etc/grafana/provisioning/dashboards/dashboard.yaml
+            - ./grafana/datasource.yaml:/etc/grafana/provisioning/datasources/datasource.yaml
+        networks:
+            - local
+    tpmongo-k6:
+        container_name: "tpmongo-k6"
+        image: loadimpact/k6:latest
+        depends_on:
+            - tpmongo-php
+            - tpmongo-influxdb
+        ports:
+            - "6565:6565"
+        environment:
+            - K6_OUT=influxdb=http://tpmongo-influxdb:8086/k6
+        volumes:
+            - ./k6:/scripts
+        networks:
+            - local
+    tpmongo-elasticsearch:
+        image: elasticsearch:8.12.2
+        container_name: tpmongo-elasticsearch
+        ports:
+            - "9200:9200"
+        environment: ['CLI_JAVA_OPTS=-Xms512m -Xmx512m','bootstrap.memory_lock=true','discovery.type=single-node','xpack.security.enabled=false', 'xpack.security.enrollment.enabled=false', 'http.cors.allow-origin=http://localhost:8180', 'http.cors.enabled=true']
+        volumes:
+            -   ./elasticsearch/synonyms:/usr/share/elasticsearch/config/synonyms
+        networks:
+            - local
+        deploy:
+            resources:
+                limits:
+                    cpus: '1.0'
+                    memory: 2048M
+                reservations:
+                    cpus: '0.50'
+                    memory: 1024M
+    tpmongo-kibana:
+        image: docker.elastic.co/kibana/kibana:8.12.2
+        container_name: tpmongo-kibana
+        ports:
+            - "5601:5601"
+        environment:
+            ELASTICSEARCH_HOSTS: '["http://tpmongo-elasticsearch:9200"]'
+            XPACK_ENCRYPTEDSAVEDOBJECTS_ENCRYPTIONKEY: d1a66dfd-c4d3-4a0a-8290-2abcb83ab3aa
+        networks:
+            - local
+    elasticvue:
+        image: cars10/elasticvue
+        container_name: elasticvue
+        ports:
+            - "8180:8080"
+        networks:
+            - local
+networks:
+    local:

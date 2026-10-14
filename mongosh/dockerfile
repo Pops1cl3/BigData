@@ -1,0 +1,12 @@
+FROM ubuntu:22.04
+
+ENTRYPOINT ["tail", "-f", "/dev/null"]
+
+RUN apt update && apt upgrade
+
+RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
+
+RUN apt install -q -y wget
+
+RUN wget https://downloads.mongodb.com/compass/mongodb-mongosh_2.1.3_amd64.deb
+RUN dpkg -i mongodb-mongosh_2.1.3_amd64.deb

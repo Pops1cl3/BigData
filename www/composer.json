@@ -1,0 +1,19 @@
+{
+    "require": {
+        "mongodb/mongodb": "1.15.0",
+        "twig/twig": "^3.5",
+        "vlucas/phpdotenv": "^5.5",
+        "elasticsearch/elasticsearch": "^8.0"
+    },
+    "config": {
+        "platform": {
+            "php": "8.3"
+        },
+        "allow-plugins": {
+            "php-http/discovery": true
+        },
+        "audit": {
+            "ignore": ["PKSA-61k5-cqr9-b8b4"]
+        }
+    }
+}
