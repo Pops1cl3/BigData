@@ -1,3 +1,18 @@
 <?php
+require_once __DIR__ . '/../init.php';
 
-echo 'supprimez un document dans la base et retournez sur la liste';
+$twig = getTwig();
+$manager = getMongoDbManager();
+
+$db = getMongoDbManager();
+$collection = $db->selectCollection('tp');
+
+$id = $_GET['id'] ?? null;
+if ($id) {
+    // 执行删除操作
+    $collection->deleteOne(['_id' => new MongoDB\BSON\ObjectId($id)]);
+}
+
+// 删除完毕后，重定向回首页
+header("Location: app.php");
+exit;

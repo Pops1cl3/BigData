@@ -1,21 +1,16 @@
 <?php
-
-include_once '../init.php';
-
-use Twig\Error\LoaderError;
-use Twig\Error\RuntimeError;
-use Twig\Error\SyntaxError;
+require_once __DIR__ . '/../init.php';
 
 $twig = getTwig();
 $manager = getMongoDbManager();
 
-// @todo implementez la récupération des données d'une entité et la passer au template
-// petite aide : https://github.com/VSG24/mongodb-php-examples
-$entity = ['name' => 'test'];
+$db = getMongoDbManager();
+$collection = $db->selectCollection('tp');
 
-// render template
-try {
-    echo $twig->render('get.html.twig', ['entity' => $entity]);
-} catch (LoaderError|RuntimeError|SyntaxError $e) {
-    echo $e->getMessage();
-}
+// 获取 URL 传过来的 id，必须转换为 MongoDB 的 ObjectId
+$id = $_GET['id'] ?? null;
+$document = $collection->findOne(['_id' => new MongoDB\BSON\ObjectId($id)]);
+
+echo $twig->render('get.html.twig', [
+    'document' => $document
+]);

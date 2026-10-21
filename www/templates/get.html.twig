@@ -1,7 +1,10 @@
 {% extends "base.html.twig" %}
-
-{% block title %}Document ""{% endblock %}
 {% block content %}
-    <p>&larr;&nbsp;<a href="/index.php">Retourner à la liste</a></p>
-    affichez le contenu d'un document de la liste
+    <h1>Détails du manuscrit</h1>
+    <ul>
+        <li><strong>ID :</strong> {{ document._id }}</li>
+        <li><strong>Titre :</strong> {{ document.titre }}</li>
+        <li><strong>Auteur :</strong> {{ document.auteur | default('Auteur inconnu') }}</li>
+    </ul>
+    <a href="app.php">Retour à la liste</a>
 {% endblock %}

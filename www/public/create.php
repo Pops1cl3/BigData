@@ -11,14 +11,18 @@ $manager = getMongoDbManager();
 
 // petite aide : https://github.com/VSG24/mongodb-php-examples
 
-if (!empty($_POST)) {
-    // @todo coder l'enregistrement d'un nouveau livre en lisant le contenu de $_POST
-} else {
-// render template
-    try {
-        echo $twig->render('create.html.twig');
-    } catch (LoaderError|RuntimeError|SyntaxError $e) {
-        echo $e->getMessage();
-    }
+$db = getMongoDbManager();
+$collection = $db->selectCollection('tp');
+
+// 如果是表单提交 (POST 请求)，则存入数据库
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $collection->insertOne([
+        'titre' => $_POST['titre'],
+        'auteur' => $_POST['auteur']
+    ]);
+    header("Location: app.php");
+    exit;
 }
+// 如果是普通访问 (GET 请求)，则显示空白表单
+echo $twig->render('create.html.twig');
 
