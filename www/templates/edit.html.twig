@@ -1,0 +1,14 @@
+{% extends "base.html.twig" %}
+{% block content %}
+    <h1>Éditer le manuscrit</h1>
+    <form method="post" action="edit.php?id={{ document._id }}">
+        <label>Titre :</label>
+        <input type="text" name="titre" value="{{ document.titre }}" required><br><br>
+
+        <label>Auteur :</label>
+        <input type="text" name="auteur" value="{{ document.auteur }}"><br><br>
+
+        <button type="submit">Mettre à jour</button>
+    </form>
+    <a href="app.php">Annuler</a>
+{% endblock %}
