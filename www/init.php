@@ -25,3 +25,14 @@ function getMongoDbManager(): Database
     return $client->selectDatabase($_ENV['MDB_DB']);
 }
 
+
+function getRedisClient() {
+    $host = 'tpmongo-redis';
+    $port = 6379;
+
+    return new Predis\Client([
+        'scheme' => 'tcp',
+        'host'   => $host,
+        'port'   => $port,
+    ]);
+}

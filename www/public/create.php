@@ -20,6 +20,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'titre' => $_POST['titre'],
         'auteur' => $_POST['auteur']
     ]);
+
+    $redis = getRedisClient();
+    $redis->del('manuscrits_homepage_list');
+
     header("Location: app.php");
     exit;
 }
